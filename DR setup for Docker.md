@@ -1,5 +1,23 @@
 # DR setup for Docker
+## Step 1: First create SSH key on DR server
+```
+ssh-keygen -t ed25519
+```
+## Step 2: Copy ssh key to DC server
+```
+nano ~/.ssh/authorized_keys
+```
+paste
 
+#### Ensure the remote Permission
+```
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+```
+#### Test the connectivity from DR Server
+```
+ssh -i ~/.ssh/id_ed25519 user@server_ip
+```
 PostgreSQL Streaming Replication Setup (Docker Compose Alfresco)
 ================================================================
 
