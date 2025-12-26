@@ -39,7 +39,7 @@ chmod 600 ~/.ssh/authorized_keys
 ```
 #### Test the connectivity from DR Server
 ```
-ssh -i ~/.ssh/id_ed25519 user@server_ip
+ssh -i /home/ketan_gcloud/.ssh/id_ed25519 drsync@10.128.0.13 "whoami; hostname"
 ```
 PostgreSQL Streaming Replication Setup (Docker Compose Alfresco)
 ================================================================
