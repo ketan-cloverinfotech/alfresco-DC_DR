@@ -1,18 +1,5 @@
 # DR setup for Docker
 
-**User:** Ketan Thombare (ketan.thombare01@gmail.com)  
-**Created:** 12/26/2025 10:05:30  
-**Updated:** 12/26/2025 12:25:36  
-**Exported:** 12/26/2025 13:33:26  
-**Link:** [https://chatgpt.com/g/g-p-694be3c5266481918c1e73da54021e52-alfesco/c/694e108f-0e30-8323-a2f8-7afb3d3e4ad8](https://chatgpt.com/g/g-p-694be3c5266481918c1e73da54021e52-alfesco/c/694e108f-0e30-8323-a2f8-7afb3d3e4ad8)  
-
-## Response:
-Sure — here’s a clean **documentation-ready** summary of exactly what we did for **PostgreSQL streaming replication** (DC = Primary, DR = Standby) for your Docker Compose Alfresco setup.
-
-I’ll write it as a step-by-step runbook you can paste into your DR document.
-
-* * *
-
 PostgreSQL Streaming Replication Setup (Docker Compose Alfresco)
 ================================================================
 
@@ -261,5 +248,3 @@ If you want, paste your **DC** and **DR** `postgres:` service sections from dock
 
 
 
----
-Powered by [ChatGPT Exporter](https://www.chatgptexporter.com)
