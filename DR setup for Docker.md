@@ -3,12 +3,35 @@
 ```
 ssh-keygen -t ed25519
 ```
-## Step 2: Copy ssh key to DC server
-```
-nano ~/.ssh/authorized_keys
-```
-paste
+## Step 2: Setup User In DC server
 
+We create user name drsync  
+```
+sudo useradd -m -s /bin/bash drsync 2>/dev/null || true
+sudo passwd -l drsync
+
+sudo mkdir -p /home/drsync/.ssh
+sudo chmod 700 /home/drsync/.ssh
+sudo touch /home/drsync/.ssh/authorized_keys
+sudo chmod 600 /home/drsync/.ssh/authorized_keys
+sudo chown -R drsync:drsync /home/drsync/.ssh
+```
+## Step 3: Paste DR ssh key to DC server
+```
+echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINol27jkcAjsmLj7xqP+ftRHcPzBfY58qcZPMTfPNvu3 ketan_gcloud@alfresco-4' \
+| sudo tee -a /home/drsync/.ssh/authorized_keys >/dev/null
+sudo chown drsync:drsync /home/drsync/.ssh/authorized_keys
+sudo chmod 600 /home/drsync/.ssh/authorized_keys
+
+```
+### Give drsync read-only access to contentstore
+```
+sudo setfacl -R -m u:drsync:rx /home/ketan_gcloud/volumes/data/alf-repo-data/contentstore
+sudo setfacl -R -d -m u:drsync:rx /home/ketan_gcloud/volumes/data/alf-repo-data/contentstore
+
+sudo setfacl -R -m u:drsync:rx /home/ketan_gcloud/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
+sudo setfacl -R -d -m u:drsync:rx /home/ketan_gcloud/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
+```
 #### Ensure the remote Permission
 ```
 chmod 700 ~/.ssh
