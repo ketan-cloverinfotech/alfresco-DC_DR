@@ -167,6 +167,7 @@ We stopped DR postgres and ran `pg_basebackup` **from DR** to pull the database 
 Command (run on DR):
 
 ```bash
+set -a; source .env; set +a
 PRIMARY_IP="10.128.0.4"
 export REPL_PASSWORD='StrongPass@123'
 
