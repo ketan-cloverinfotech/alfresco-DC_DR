@@ -84,7 +84,7 @@ A2) Create replication user (replicator)
 On DC:
 
 ```bash
-docker compose exec -T postgres psql -U "$POSTGRES_USER" -d postgres -c "
+docker compose exec -T postgres psql -U alfresco -d postgres -c "
 DO \$\$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='replicator') THEN
@@ -104,7 +104,7 @@ A3) Enable required replication parameters (ALTER SYSTEM)
 On DC:
 
 ```bash
-docker compose exec -T postgres psql -U "$POSTGRES_USER" -d postgres -c "
+docker compose exec -T postgres psql -U alfresco -d postgres -c "
 ALTER SYSTEM SET listen_addresses='*';
 ALTER SYSTEM SET wal_level='replica';
 ALTER SYSTEM SET max_wal_senders='10';
@@ -139,7 +139,7 @@ HBA=$(psql -U "$POSTGRES_USER" -Atc "show hba_file");
 echo "host replication replicator '"$DR_IP"'/32 md5" >> "$HBA";
 tail -n 10 "$HBA"
 '
-docker compose exec -T postgres psql -U "$POSTGRES_USER" -d postgres -c "select pg_reload_conf();"
+docker compose exec -T postgres psql -U alfresco -d postgres -c "select pg_reload_conf();"
 ```
 
 **Purpose:** permit DR server IP to connect for replication.
@@ -154,7 +154,7 @@ A5) Create physical replication slot
 On DC:
 
 ```bash
-docker compose exec -T postgres psql -U "$POSTGRES_USER" -d postgres -c \
+docker compose exec -T postgres psql -U alfresco -d postgres -c \
 "SELECT * FROM pg_create_physical_replication_slot('dr_slot');"
 ```
 
@@ -168,7 +168,7 @@ A6) Primary-side verification
 On DC:
 
 ```bash
-docker compose exec -T postgres psql -U "$POSTGRES_USER" -d postgres -c \
+docker compose exec -T postgres psql -U alfresco -d postgres -c \
 "select client_addr,state,sync_state,write_lag,flush_lag,replay_lag from pg_stat_replication;"
 ```
 
