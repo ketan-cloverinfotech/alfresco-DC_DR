@@ -18,7 +18,7 @@ sudo chown -R drsync:drsync /home/drsync/.ssh
 ```
 ## Step 3: Paste DR ssh key to DC server
 ```
-echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINol27jkcAjsmLj7xqP+ftRHcPzBfY58qcZPMTfPNvu3 ketan_gcloud@alfresco-4' \
+echo 'ssh-key' \
 | sudo tee -a /home/drsync/.ssh/authorized_keys >/dev/null
 sudo chown drsync:drsync /home/drsync/.ssh/authorized_keys
 sudo chmod 600 /home/drsync/.ssh/authorized_keys
@@ -26,11 +26,11 @@ sudo chmod 600 /home/drsync/.ssh/authorized_keys
 ```
 ### Give drsync read-only access to contentstore
 ```
-sudo setfacl -R -m u:drsync:rx /home/ketan_gcloud/volumes/data/alf-repo-data/contentstore
-sudo setfacl -R -d -m u:drsync:rx /home/ketan_gcloud/volumes/data/alf-repo-data/contentstore
+sudo setfacl -R -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore
+sudo setfacl -R -d -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore
 
-sudo setfacl -R -m u:drsync:rx /home/ketan_gcloud/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
-sudo setfacl -R -d -m u:drsync:rx /home/ketan_gcloud/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
+sudo setfacl -R -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
+sudo setfacl -R -d -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
 ```
 #### Ensure the remote Permission
 ```
