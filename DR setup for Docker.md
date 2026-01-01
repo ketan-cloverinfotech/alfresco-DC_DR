@@ -224,8 +224,8 @@ B2) Standby-side verification (DR)
 On DR:
 
 ```bash
-docker compose exec -T postgres psql -U alfresco -d postgres -c "select pg_is_in_recovery();"
-docker compose exec -T postgres psql -U alfresco -d postgres -c "select * from pg_stat_wal_receiver;"
+docker compose exec postgres psql -U alfresco -d template1 -c "SELECT pg_is_in_recovery();"
+docker compose exec postgres psql -U alfresco -d template1 -c "SELECT status, sender_host FROM pg_stat_wal_receiver;"
 ```
 
 Expected:
