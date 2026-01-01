@@ -191,7 +191,7 @@ Command (run on DR):
 
 ```bash
 set -a; source .env; set +a
-PRIMARY_IP="10.128.0.4"
+PRIMARY_IP="10.128.0.4" #DC sever ip
 export REPL_PASSWORD='StrongPass@123'
 
 docker compose stop postgres
