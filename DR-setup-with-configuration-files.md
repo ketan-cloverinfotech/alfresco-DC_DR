@@ -364,8 +364,6 @@ services:
 
     command: >
       postgres
-      -c config_file=/etc/postgresql/postgresql.conf
-      -c hba_file=/etc/postgresql/pg_hba.conf
       -c max_connections=300
       -c log_min_messages=LOG
 
