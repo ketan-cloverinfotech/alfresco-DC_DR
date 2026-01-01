@@ -342,3 +342,48 @@ volumes:
 networks:
   internal:
 ```
+
+
+###Check Network connectivity
+```
+docker compose exec postgres bash -lc \
+"export PGPASSWORD='alfresco'; psql -h 10.128.0.2 -p 5432 -U alfresco -d alfresco -c 'SELECT now();'"
+```
+
+On DR side we didnt required any configuration 
+The docker compose looks as follow
+```
+services:
+  postgres:
+    image: postgres:16.5
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: alfresco
+      POSTGRES_USER: alfresco
+      POSTGRES_DB: alfresco
+
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c hba_file=/etc/postgresql/pg_hba.conf
+      -c max_connections=300
+      -c log_min_messages=LOG
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - ./volumes/data/postgres-data:/var/lib/postgresql/data:Z
+      - ./volumes/logs/postgres:/var/log/postgresql:Z
+
+    networks:
+      - internal
+
+    healthcheck:
+     # test: ["CMD-SHELL", "pg_isready -d $POSTGRES_DB -U $POSTGRES_USER"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U alfresco -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+```
