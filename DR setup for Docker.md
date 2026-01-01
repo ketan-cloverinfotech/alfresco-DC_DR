@@ -34,8 +34,8 @@ sudo setfacl -R -d -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore.dele
 ```
 #### Ensure the remote Permission
 ```
-chmod 700 ~/home/drsync/.ssh
-chmod 600 ~/home/drsync/.ssh/authorized_keys
+chmod 700 /home/drsync/.ssh
+chmod 600 /home/drsync/.ssh/authorized_keys
 ```
 #### Test the connectivity from DR Server
 ```
