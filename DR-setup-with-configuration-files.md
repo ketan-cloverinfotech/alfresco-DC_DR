@@ -385,3 +385,12 @@ services:
       retries: 10
       start_period: 10s
 ```
+## Create ssh connectivity if user is root then for rsync use
+
+```
+sudo rsync -aHAX --numeric-ids --delete --inplace --partial --info=progress2 \
+  -e "ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \
+  --rsync-path="sudo rsync" \
+  drsync@10.128.0.4:/root/volumes/data/alf-repo-data/contentstore/ \
+  /root/volumes/data/alf-repo-data/contentstore/
+```
