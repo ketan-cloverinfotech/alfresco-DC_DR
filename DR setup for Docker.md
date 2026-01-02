@@ -16,6 +16,15 @@ sudo touch /home/drsync/.ssh/authorized_keys
 sudo chmod 600 /home/drsync/.ssh/authorized_keys
 sudo chown -R drsync:drsync /home/drsync/.ssh
 ```
+## Step 2.1: Allow drsync to run rsync as root (passwordless) on DC:
+type
+```
+visudo 
+```
+and 
+```
+drsync ALL=(root) NOPASSWD:/usr/bin/rsync
+```
 ## Step 3: Paste DR ssh key to DC server
 ```
 echo 'ssh-key' \
