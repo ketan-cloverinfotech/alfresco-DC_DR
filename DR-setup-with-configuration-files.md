@@ -394,3 +394,23 @@ sudo rsync -aHAX --numeric-ids --delete --inplace --partial --info=progress2 \
   drsync@10.128.0.4:/root/volumes/data/alf-repo-data/contentstore/ \
   /root/volumes/data/alf-repo-data/contentstore/
 ```
+## Do following activity on DR
+Stop docker service
+```
+docker compose stop postgres
+```
+## Make sure you’re wiping the right PGDATA
+```
+rm -rf /root/volumes/data/postgres-data/*
+```
+## Run pg_basebackup from DR2 → DC2
+```
+export REPL_PASSWORD='StrongPass@123'
+PRIMARY_IP="10.128.0.4"
+
+docker compose run --rm \
+  -e PGPASSWORD="$REPL_PASSWORD" \
+  postgres bash -lc "
+set -e
+pg_basebackup -h $PRIMARY_IP -p 5432 -U replicator -D \"\$PGDATA\" -Fp -Xs -P -R -S dr_slot
+"
