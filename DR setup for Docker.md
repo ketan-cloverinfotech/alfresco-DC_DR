@@ -50,6 +50,9 @@ chmod 600 /home/drsync/.ssh/authorized_keys
 ```
 ssh -i /home/ketan_gcloud/.ssh/id_ed25519 drsync@10.128.0.13 "whoami; hostname"
 ```
+```
+ssh -i /root/.ssh/id_ed25519 drsync@10.128.0.18 "ls -ld /home/ketanexam92; ls -l /home/ketanexam92 | head"
+```
 PostgreSQL Streaming Replication Setup (Docker Compose Alfresco)
 ================================================================
 
