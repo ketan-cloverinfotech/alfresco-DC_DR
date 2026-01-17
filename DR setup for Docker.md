@@ -54,6 +54,15 @@ sudo setfacl -R -m u:drsync:rx /root/volumes/data/wal-archive
 # (optional) default ACL for any new WAL files created later
 sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/wal-archive
 ```
+
+#### On DC add sudoers rule for rsync user
+```
+sudo tee /etc/sudoers.d/drsync-rsync >/dev/null <<'EOF'
+drsync ALL=(root) NOPASSWD: /usr/bin/rsync
+Defaults:drsync !requiretty
+EOF
+sudo chmod 440 /etc/sudoers.d/drsync-rsync
+```
 #### Ensure the remote Permission
 ```
 chmod 700 /home/drsync/.ssh
@@ -392,6 +401,7 @@ echo "[$(date -Is)] START wal-archive rsync" >> "$LOG"
 # NOTE: no --delete by default (safer for WAL archive)
 rsync -aHAX --numeric-ids --inplace --partial --info=progress2 \
   -e "ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \
+  --rsync-path="sudo -n rsync" \
   "$SRC" "$DEST" >> "$LOG" 2>&1
 
 echo "[$(date -Is)] END wal-archive rsync (rc=$?)" >> "$LOG"
