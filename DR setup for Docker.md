@@ -35,11 +35,19 @@ sudo systemctl restart sshd
 ```
 ### Give drsync read-only access to contentstore
 ```
-sudo setfacl -R -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore
-sudo setfacl -R -d -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore
+# allow traverse-only on parent dirs (no listing)
+sudo setfacl -m u:drsync:--x /root
+sudo setfacl -m u:drsync:--x /root/volumes
+sudo setfacl -m u:drsync:--x /root/volumes/data
+sudo setfacl -m u:drsync:--x /root/volumes/data/alf-repo-data
 
-sudo setfacl -R -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
-sudo setfacl -R -d -m u:drsync:rx ./volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
+# allow read+traverse on actual contentstore
+sudo setfacl -R -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore
+sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore
+
+# same for deleted if you use it
+sudo setfacl -R -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
+sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
 ```
 #### Ensure the remote Permission
 ```
