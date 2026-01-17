@@ -308,5 +308,105 @@ docker compose exec -T postgres psql -U "$POSTGRES_USER" -d postgres -c "select 
 
 If you want, paste your **DC** and **DR** `postgres:` service sections from docker-compose (just that block), and I’ll convert this into a polished “SOP” format (Prereqs → Commands → Expected Output → Rollback → Failover/Failback notes).
 
+# Create cron Jobs for Rsync 
+## 1: Create Cronjob for Contentstore rsync
+```
+sudo tee /usr/local/bin/alf-contentstore-sync.sh >/dev/null <<'EOF'
+#!/bin/bash
+set -euo pipefail
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
+DC_IP="10.128.0.17"
+SRC="drsync@${DC_IP}:/root/volumes/data/alf-repo-data/contentstore/"
+DEST="/root/volumes/data/alf-repo-data/contentstore/"
 
+LOG="/var/log/alf-contentstore-sync.log"
+LOCK="/var/lock/alf-contentstore-sync.lock"
+
+mkdir -p "$(dirname "$LOG")" "$(dirname "$LOCK")" "$DEST"
+
+# prevent overlapping runs
+exec 200>"$LOCK"
+flock -n 200 || exit 0
+
+echo "[$(date -Is)] START contentstore rsync" >> "$LOG"
+
+rsync -aHAX --numeric-ids --delete --inplace --partial --info=progress2 \
+  -e "ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \
+  "$SRC" "$DEST" >> "$LOG" 2>&1
+
+rc=$?
+echo "[$(date -Is)] END contentstore rsync (rc=$rc)" >> "$LOG"
+exit $rc
+EOF
+
+sudo chmod 750 /usr/local/bin/alf-contentstore-sync.sh
+sudo chown root:root /usr/local/bin/alf-contentstore-sync.sh
+```
+### 1.2: test 
+```
+/usr/local/bin/alf-contentstore-sync.sh
+tail -n 50 /var/log/alf-contentstore-sync.log
+```
+### 1.3 Create cronTab 
+```
+sudo crontab -e
+```
+Add (every 10 minutes):
+```
+*/10 * * * * /usr/local/bin/alf-contentstore-sync.sh
+```
+
+Check cron logs:
+```
+sudo systemctl enable --now crond
+sudo tail -n 50 /var/log/cron
+```
+
+## 2: WAL archive rsync cron (DR pulls from DC)
+### 2.1 Create script on DR
+```
+sudo tee /usr/local/bin/pg-wal-archive-sync.sh >/dev/null <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+DC_IP="10.128.0.17"
+SRC="drsync@${DC_IP}:/root/volumes/data/wal-archive/"
+DEST="/root/volumes/data/wal-archive/"
+
+LOG="/var/log/pg-wal-archive-sync.log"
+LOCK="/var/lock/pg-wal-archive-sync.lock"
+
+mkdir -p "$(dirname "$LOG")" "$(dirname "$LOCK")" "$DEST"
+
+exec 200>"$LOCK"
+flock -n 200 || exit 0
+
+echo "[$(date -Is)] START wal-archive rsync" >> "$LOG"
+
+# NOTE: no --delete by default (safer for WAL archive)
+rsync -aHAX --numeric-ids --inplace --partial --info=progress2 \
+  -e "ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \
+  "$SRC" "$DEST" >> "$LOG" 2>&1
+
+echo "[$(date -Is)] END wal-archive rsync (rc=$?)" >> "$LOG"
+EOF
+
+sudo chmod +x /usr/local/bin/pg-wal-archive-sync.sh
+```
+
+### 2.2 test
+```
+sudo /usr/local/bin/pg-wal-archive-sync.sh
+tail -n 50 /var/log/pg-wal-archive-sync.log
+```
+### 2.3 Add cron entry on DR
+Edit root crontab again:
+```
+sudo crontab -e
+```
+
+Add (every 1 minute — good for low RPO):
+```
+* * * * * /usr/local/bin/pg-wal-archive-sync.sh
+```
