@@ -48,6 +48,11 @@ sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore
 # same for deleted if you use it
 sudo setfacl -R -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
 sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
+# allow drsync to read + traverse wal-archive
+sudo setfacl -R -m u:drsync:rx /root/volumes/data/wal-archive
+
+# (optional) default ACL for any new WAL files created later
+sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/wal-archive
 ```
 #### Ensure the remote Permission
 ```
