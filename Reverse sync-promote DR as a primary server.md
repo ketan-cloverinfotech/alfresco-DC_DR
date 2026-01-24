@@ -24,7 +24,7 @@ FROM pg_stat_replication;"
 ```
 You should get following output(must)
 
-```
-**state = streaming
-lag_bytes ideally 0 (or very small)**
-```
+
+_state = streaming
+lag_bytes ideally 0 (or very small)_
+
