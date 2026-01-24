@@ -157,5 +157,4 @@ docker compose exec -u postgres postgres psql -U alfresco -d postgres -c "SELECT
 
 
 
----
-Powered by [ChatGPT Exporter](https://www.chatgptexporter.com)
+
