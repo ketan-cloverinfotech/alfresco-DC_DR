@@ -1,6 +1,12 @@
 # Alfresco DR setup
 ## On DC create following files in ./volumes/config/postgres
-#### pg_hba.conf
+## First see subnet of each docker compose 
+**_run command each server_**
+```
+docker network ls
+docker network inspect <network-name> --format '{{range .IPAM.Config}}{{.Subnet}}{{"\n"}}{{end}}'
+```
+### pg_hba.conf
 ```
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
