@@ -7,7 +7,7 @@ Below are the **exact commands**.
 
 * * *
 
-1) On DR (10.128.0.18) — allow DC to connect for replication
+Step 1: On DR (10.128.0.18) — allow DC to connect for replication
 ============================================================
 
 ### 1.1 Add DC replication rule in DR `pg_hba.conf`
@@ -33,7 +33,7 @@ docker compose exec -u postgres postgres pg_ctl -D "$PGDATA" reload
 ```
 
 ### 1.3 (Recommended) Create a new replication slot on DR for DC
-
+On **DR**
 ```bash
 cd /root
 docker compose exec -u postgres postgres psql -U alfresco -d postgres -c "SELECT pg_create_physical_replication_slot('dc_slot');"
@@ -46,7 +46,7 @@ docker compose exec -u postgres postgres psql -U alfresco -d postgres -c "SELECT
 2) On DC (10.128.0.17) — rebuild postgres data as standby from DR
 =================================================================
 
-2.1 Stop postgres on DC (and keep apps stopped)
+Step:2 Stop postgres on DC (and keep apps stopped)
 -----------------------------------------------
 
 ```bash
