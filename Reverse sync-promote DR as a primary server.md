@@ -22,12 +22,6 @@ SELECT client_addr, state,
        pg_wal_lsn_diff(sent_lsn, replay_lsn) AS lag_bytes
 FROM pg_stat_replication;"
 ```
-docker compose exec -u postgres postgres psql -U alfresco -d postgres -c "
-SELECT client_addr, state,
-       sent_lsn, replay_lsn,
-       pg_wal_lsn_diff(sent_lsn, replay_lsn) AS lag_bytes
-FROM pg_stat_replication;"
-```
 You should get following output(must)
 
 ```
