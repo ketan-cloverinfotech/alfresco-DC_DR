@@ -47,7 +47,7 @@ On DC
 ```
 docker compose stop postgres
 ```
-## Promote DR Postgres to PRIMARY
+## Step 7:Promote DR Postgres to PRIMARY
 On **DR**
 **(recommended): promote via SQL**
 ```
@@ -62,7 +62,7 @@ Output **Must** return
 
 **f**
 
-## Step 7: 7) Start the full Alfresco stack on DR
+## Step 8: Start the full Alfresco stack on DR
 ```
 docker compose up -d
 ```
