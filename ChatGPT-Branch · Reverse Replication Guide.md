@@ -1,13 +1,4 @@
-# Branch · Reverse Replication Guide
-
-**User:** Ketan Thombare (ketan.thombare01@gmail.com)  
-**Created:** 1/23/2026 13:37:33  
-**Updated:** 1/24/2026 20:31:07  
-**Exported:** 1/24/2026 20:37:21  
-**Link:** [https://chatgpt.com/g/g-p-69730fe38b108191ac22c9f5f31d997f-alfresco-internal/c/69732c25-8e2c-8323-a34f-c121252cf281](https://chatgpt.com/g/g-p-69730fe38b108191ac22c9f5f31d997f-alfresco-internal/c/69732c25-8e2c-8323-a34f-c121252cf281)  
-
-## Response:
-Thought for 1m 37s
+# Promote DC as A standby
 
 Perfect — you already **promoted DR** (it shows `pg_is_in_recovery() = f`).  
 Now you want **DC to become standby of DR** (reverse streaming replication).
