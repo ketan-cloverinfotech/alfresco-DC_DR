@@ -1,37 +1,71 @@
 # Alfresco DR setup
 ## On DC create following files in ./volumes/config/postgres
-####pg_hba.conf
+#### pg_hba.conf
 ```
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
-# Local socket connections
+# Local socket inside container
 local   all             all                                     trust
 
-# Localhost
+# Localhost inside container
 host    all             all             127.0.0.1/32            trust
 host    all             all             ::1/128                 trust
 
-# --- REPLICATION (DR streaming) ---
-# DR server (10.128.0.3) connects to DC primary as user "replicator"
-host    replication     replicator      10.128.0.18/32           md5
-
-# Allow Alfresco app connections from docker network
-host    alfresco        alfresco        172.18.0.0/16        scram-sha-256
-host    all             alfresco        172.18.0.0/16        scram-sha-256
+# Monitoring (optional)
+host    all             exporter        127.0.0.1/32            scram-sha-256
+host    all             exporter        ::1/128                 scram-sha-256
 
 
-# --- NORMAL DB ACCESS ---
-# Allow app connections (tighten subnet if you know docker subnet)
-host    alfresco        alfresco        172.31.0.0/24           scram-sha-256
+# ---------------- REPLICATION ----------------
+# Allow DR to replicate from DC (normal direction)
+host    replication     replicator      10.128.0.18/32          scram-sha-256
 
-# If you also want admin connections from the same subnet:
-host    all             all             172.31.0.0/24           scram-sha-256
+# Optional but useful: allow DC to connect too (helps during role switch tests)
+host    replication     replicator      10.128.0.17/32          scram-sha-256
 
-# (Optional but safe) Reject everything else explicitly
+
+# ---------------- ALFRESCO APP (Docker subnet) ----------------
+# Allow containers on docker network to connect as alfresco user
+host    alfresco        alfresco        172.19.0.0/16           scram-sha-256
+host    all             alfresco        172.19.0.0/16           scram-sha-256
+
+
+# Optional: block everything else
 # host  all             all             0.0.0.0/0               reject
-
 ```
-####postgresql.conf
+**On DR**
+```
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# Local socket inside container
+local   all             all                                     trust
+
+# Localhost inside container
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+
+# Monitoring (optional)
+host    all             exporter        127.0.0.1/32            scram-sha-256
+host    all             exporter        ::1/128                 scram-sha-256
+
+
+# ---------------- REPLICATION ----------------
+# Allow DC to replicate from DR (this is required after DR is promoted)
+host    replication     replicator      10.128.0.17/32          scram-sha-256
+
+# Optional: allow DR itself too (not required)
+host    replication     replicator      10.128.0.18/32          scram-sha-256
+
+
+# ---------------- ALFRESCO APP (Docker subnet) ----------------
+host    alfresco        alfresco        172.19.0.0/16           scram-sha-256
+host    all             alfresco        172.19.0.0/16           scram-sha-256
+
+
+# Optional: block everything else
+# host  all             all             0.0.0.0/0               reject
+```
+#### postgresql.conf
 ```
 listen_addresses = '*'
 port = 5432
@@ -54,6 +88,11 @@ archive_command = 'test ! -f /var/lib/postgresql/wal_archive/%f && cp %p /var/li
 
 # (Optional) Useful logging
 log_min_messages = LOG
+```
+### Relaod Postgres after editing
+```
+cd /root
+docker compose exec -u postgres postgres pg_ctl -D "$PGDATA" reload
 ```
 create init directory and create file
 ####01-replication.sql
