@@ -61,3 +61,8 @@ docker compose exec -u postgres postgres psql -U alfresco -d postgres -c "SELECT
 Output **Must** return
 
 **f**
+
+## Step 7: 7) Start the full Alfresco stack on DR
+```
+docker compose up -d
+```
