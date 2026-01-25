@@ -323,39 +323,124 @@ docker compose exec -T postgres psql -U "$POSTGRES_USER" -d postgres -c "select 
 If you want, paste your **DC** and **DR** `postgres:` service sections from docker-compose (just that block), and I’ll convert this into a polished “SOP” format (Prereqs → Commands → Expected Output → Rollback → Failover/Failback notes).
 
 # Create cron Jobs for Rsync 
-## 1: Create Cronjob for Contentstore rsync
+## 1: Create Script for rsync -
+**for DR**
 ```
-sudo tee /usr/local/bin/alf-contentstore-sync.sh >/dev/null <<'EOF'
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
+# DR is PRIMARY, push data from DR -> DC
 DC_IP="10.128.0.17"
-SRC="drsync@${DC_IP}:/root/volumes/data/alf-repo-data/contentstore/"
-DEST="/root/volumes/data/alf-repo-data/contentstore/"
+SSH_USER="drsync"
+SSH_KEY="/root/.ssh/id_ed25519"
+SSH_OPTS="-i ${SSH_KEY} -o StrictHostKeyChecking=accept-new"
 
-LOG="/var/log/alf-contentstore-sync.log"
-LOCK="/var/lock/alf-contentstore-sync.lock"
+# Local source on DR
+BASE_LOCAL="/root/volumes/data/alf-repo-data"
+# Remote destination base on DC
+BASE_REMOTE="${SSH_USER}@${DC_IP}:${BASE_LOCAL}"
 
-mkdir -p "$(dirname "$LOG")" "$(dirname "$LOCK")" "$DEST"
+# Logs/lock stored in ./logs directory next to this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="${SCRIPT_DIR}/logs"
+LOG="${LOG_DIR}/alf-contentstore-sync.log"
+LOCK="${LOG_DIR}/alf-contentstore-sync.lock"
+
+mkdir -p "$LOG_DIR"
 
 # prevent overlapping runs
 exec 200>"$LOCK"
 flock -n 200 || exit 0
 
-echo "[$(date -Is)] START contentstore rsync" >> "$LOG"
+ts() { date -Is; }
 
-rsync -aHAX --numeric-ids --delete --inplace --partial --info=progress2 \
-  -e "ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new" \
-  "$SRC" "$DEST" >> "$LOG" 2>&1
+echo "[$(ts)] START alfresco content sync (DR -> DC)" >> "$LOG"
+
+# Common rsync options (safe defaults: NO --delete for continuous sync)
+RSYNC_OPTS=(-aHAX --numeric-ids --partial --info=progress2)
+
+sync_dir () {
+  local dir="$1"
+  local src="${BASE_LOCAL}/${dir}/"
+  local dst="${BASE_REMOTE}/${dir}/"
+
+  if [[ ! -d "${BASE_LOCAL}/${dir}" ]]; then
+    echo "[$(ts)] SKIP ${dir} (not found on DR)" >> "$LOG"
+    return 0
+  fi
+
+  echo "[$(ts)] RSYNC ${dir}" >> "$LOG"
+  rsync "${RSYNC_OPTS[@]}" -e "ssh ${SSH_OPTS}" --rsync-path="sudo -n rsync" "$src" "$dst" >> "$LOG" 2>&1
+}
+
+sync_dir "contentstore"
+sync_dir "contentstore.deleted"
+
 
 rc=$?
-echo "[$(date -Is)] END contentstore rsync (rc=$rc)" >> "$LOG"
+echo "[$(ts)] END alfresco content sync (rc=$rc)" >> "$LOG"
 exit $rc
-EOF
+```
 
-sudo chmod 750 /usr/local/bin/alf-contentstore-sync.sh
-sudo chown root:root /usr/local/bin/alf-contentstore-sync.sh
+**For DC**
+```
+#!/usr/bin/env bash
+set -euo pipefail
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# DR is PRIMARY, push data from DR -> DC
+DR_IP="10.128.0.18"
+SSH_USER="drsync"
+SSH_KEY="/root/.ssh/id_ed25519"
+SSH_OPTS="-i ${SSH_KEY} -o StrictHostKeyChecking=accept-new"
+
+# Local source on DR
+BASE_LOCAL="/root/volumes/data/alf-repo-data"
+# Remote destination base on DC
+BASE_REMOTE="${SSH_USER}@${DR_IP}:${BASE_LOCAL}"
+
+# Logs/lock stored in ./logs directory next to this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="${SCRIPT_DIR}/logs"
+LOG="${LOG_DIR}/alf-contentstore-sync.log"
+LOCK="${LOG_DIR}/alf-contentstore-sync.lock"
+
+mkdir -p "$LOG_DIR"
+
+# prevent overlapping runs
+exec 200>"$LOCK"
+flock -n 200 || exit 0
+
+ts() { date -Is; }
+
+echo "[$(ts)] START alfresco content sync (DR -> DC)" >> "$LOG"
+
+# Common rsync options (safe defaults: NO --delete for continuous sync)
+RSYNC_OPTS=(-aHAX --numeric-ids --partial --info=progress2)
+
+sync_dir () {
+  local dir="$1"
+  local src="${BASE_LOCAL}/${dir}/"
+  local dst="${BASE_REMOTE}/${dir}/"
+
+  if [[ ! -d "${BASE_LOCAL}/${dir}" ]]; then
+    echo "[$(ts)] SKIP ${dir} (not found on DR)" >> "$LOG"
+    return 0
+  fi
+
+  echo "[$(ts)] RSYNC ${dir}" >> "$LOG"
+  rsync "${RSYNC_OPTS[@]}" -e "ssh ${SSH_OPTS}" --rsync-path="sudo -n rsync"  "$src" "$dst" >> "$LOG" 2>&1
+}
+
+sync_dir "contentstore"
+sync_dir "contentstore.deleted"
+
+
+rc=$?
+echo "[$(ts)] END alfresco content sync (rc=$rc)" >> "$LOG"
+exit $rc
+
 ```
 ### 1.2: test 
 ```
