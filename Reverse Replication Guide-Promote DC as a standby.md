@@ -1,7 +1,7 @@
 # Promote DC as A standby
 
 ## Step 0: Pre-requisits
-- Stop all cronjobs
+- Stop all cronjobs On DR sides
 - check DC is standy or not step 3.1
 - 
 
