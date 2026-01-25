@@ -1,14 +1,16 @@
 # Promote DC as A standby
 
-Perfect — you already **promoted DR** (it shows `pg_is_in_recovery() = f`).  
-Now you want **DC to become standby of DR** (reverse streaming replication).
+## Step 0: Pre-requisits
+- Stop all cronjobs
+- check DC is standy or not step 3.1
+- 
+
 
 Below are the **exact commands**.
 
 * * *
 
-Step 1: On DR (10.128.0.18) — allow DC to connect for replication
-============================================================
+## Step 1: On DR (10.128.0.18) — allow DC to connect for replication
 
 ### 1.1 Add DC replication rule in DR `pg_hba.conf`
 
