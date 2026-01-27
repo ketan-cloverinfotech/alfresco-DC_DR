@@ -35,24 +35,24 @@ sudo systemctl restart sshd
 ```
 ### Give drsync read-only access to contentstore
 ```
-# allow traverse-only on parent dirs (no listing)
+# 1) Traverse-only on parent dirs (no listing)
 sudo setfacl -m u:drsync:--x /root
 sudo setfacl -m u:drsync:--x /root/volumes
 sudo setfacl -m u:drsync:--x /root/volumes/data
 sudo setfacl -m u:drsync:--x /root/volumes/data/alf-repo-data
 
-# allow read+traverse on actual contentstore
+# 2) Contentstore: read + traverse (and defaults for new files/dirs)
 sudo setfacl -R -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore
 sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore
 
-# same for deleted if you use it
+# 3) contentstore.deleted (optional)
 sudo setfacl -R -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
 sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/alf-repo-data/contentstore.deleted 2>/dev/null || true
-# allow drsync to read + traverse wal-archive
-sudo setfacl -R -m u:drsync:rx /root/volumes/data/wal-archive
 
-# (optional) default ACL for any new WAL files created later
+# 4) WAL archive: read + traverse (and defaults for new WAL files)
+sudo setfacl -R -m u:drsync:rx /root/volumes/data/wal-archive
 sudo setfacl -R -d -m u:drsync:rx /root/volumes/data/wal-archive
+
 ```
 
 #### On DC add sudoers rule for rsync user
