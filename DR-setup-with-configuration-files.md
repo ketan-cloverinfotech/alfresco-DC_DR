@@ -25,16 +25,17 @@ host    all             exporter        ::1/128                 scram-sha-256
 
 # ---------------- REPLICATION ----------------
 # Allow DR to replicate from DC (normal direction)
-host    replication     replicator      10.128.0.18/32          scram-sha-256
+hostnossl  alfresco   alfresco   10.128.0.20/32   scram-sha-256
+hostssl    alfresco   alfresco   10.128.0.20/32   scram-sha-256
 
 # Optional but useful: allow DC to connect too (helps during role switch tests)
-host    replication     replicator      10.128.0.17/32          scram-sha-256
+host    replication     replicator      10.128.0.19/32          scram-sha-256
 
 
 # ---------------- ALFRESCO APP (Docker subnet) ----------------
 # Allow containers on docker network to connect as alfresco user
-host    alfresco        alfresco        172.19.0.0/16           scram-sha-256
-host    all             alfresco        172.19.0.0/16           scram-sha-256
+host    alfresco        alfresco        172.18.0.0/16           scram-sha-256
+host    all             alfresco        172.18.0.0/16           scram-sha-256
 
 
 # Optional: block everything else
