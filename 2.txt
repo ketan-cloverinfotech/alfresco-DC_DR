@@ -1,0 +1,267 @@
+/* =========================================================
+   ChatGPT Beauty Pack (CSS only)
+   Wide + Typography + Soft Cards + Pink Composer + User Bubble
+   ========================================================= */
+
+/* ---------- Theme knobs ---------- */
+:root{
+  /* Typography */
+  --chat-font: 18px;
+  --code-font: 15.5px;
+  --line-height: 1.65;
+
+  /* Layout */
+  --side-gap: 15px;            /* side padding */
+
+  /* Surfaces */
+  --bg: #ffffff;
+  --panel: rgba(255,255,255,.70);
+  --panel-border: rgba(17,24,39,.10);
+  --shadow: 0 10px 30px rgba(17,24,39,.08);
+
+  /* Accent (pink) */
+  --accent: #ff4fa3;
+  --accent-weak: rgba(255,79,163,.14);
+  --accent-mid: rgba(255,79,163,.25);
+
+  /* Composer */
+  --input-bg: #ffeaf3;
+  --input-border: #ffc1d6;
+  --input-focus: rgba(255,193,214,.55);
+
+  /* Bubbles */
+  --user-bubble: #ffeaf3;
+  --user-border: #ffc1d6;
+
+  --assistant-bubble: rgba(255,255,255,.75);
+  --assistant-border: rgba(17,24,39,.10);
+
+  /* Rounding */
+  --radius-lg: 18px;
+  --radius-md: 14px;
+
+  /* Code block */
+  --code-bg: rgba(17,24,39,.04);
+  --code-border: rgba(17,24,39,.10);
+}
+
+/* Dark mode tune (works with OS dark preference) */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0b0f17;
+    --panel: rgba(13,18,28,.62);
+    --panel-border: rgba(255,255,255,.10);
+    --shadow: 0 14px 40px rgba(0,0,0,.35);
+
+    --assistant-bubble: rgba(13,18,28,.58);
+    --assistant-border: rgba(255,255,255,.10);
+
+    --code-bg: rgba(255,255,255,.06);
+    --code-border: rgba(255,255,255,.12);
+  }
+}
+
+/* ---------- Base page polish ---------- */
+html, body{
+  font-size: var(--chat-font) !important;
+  line-height: var(--line-height) !important;
+  background: radial-gradient(1200px 600px at 20% 0%, var(--accent-weak), transparent 55%),
+              radial-gradient(900px 500px at 90% 10%, rgba(79,179,255,.10), transparent 60%),
+              var(--bg) !important;
+  overflow-x: hidden !important;
+}
+
+/* Smoother text */
+body *{
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------- Width: FULL-WIDTH (matches your older wider view) ---------- */
+/* Key fix: force width:100% and remove all max-width + mx-auto centering */
+main,
+main > div,
+main .mx-auto,
+main [class*="max-w-"],
+div[class*="max-w-"]{
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: var(--side-gap) !important;
+  padding-right: var(--side-gap) !important;
+}
+
+/* Keep the sidebar visible (you can still collapse it to icons) */
+aside,
+[aria-label="Chat sidebar"],
+[data-testid="left-panel"],
+[data-testid="sidebar"]{
+  display: block !important;
+}
+
+/* Expand message area */
+.prose,
+.markdown,
+article,
+[data-message-author-role]{
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* ---------- Typography upgrades ---------- */
+[data-message-author-role]{
+  font-size: var(--chat-font) !important;
+  line-height: calc(var(--line-height) + .05) !important;
+}
+
+/* Headings: slightly less shouty, more balanced */
+.prose h1, .markdown h1, [data-message-author-role] h1{
+  font-size: clamp(1.6em, 2.2vw, 2.05em) !important;
+  font-weight: 750 !important;
+  letter-spacing: -0.02em;
+  margin: .7em 0 .35em !important;
+}
+.prose h2, .markdown h2, [data-message-author-role] h2{
+  font-size: clamp(1.35em, 1.8vw, 1.75em) !important;
+  font-weight: 730 !important;
+  letter-spacing: -0.015em;
+  margin: .7em 0 .35em !important;
+}
+.prose h3, .markdown h3, [data-message-author-role] h3{
+  font-size: clamp(1.18em, 1.4vw, 1.45em) !important;
+  font-weight: 700 !important;
+  margin: .7em 0 .35em !important;
+}
+
+.prose p, .markdown p{
+  margin: .55em 0 !important;
+}
+.prose ul, .markdown ul,
+.prose ol, .markdown ol{
+  margin: .5em 0 .8em !important;
+}
+.prose li, .markdown li{
+  margin: .25em 0 !important;
+}
+
+/* Links */
+a{
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(255,79,163,.35);
+}
+a:hover{
+  border-bottom-color: rgba(255,79,163,.85);
+}
+
+/* Blockquote */
+blockquote{
+  border-left: 4px solid rgba(255,79,163,.40) !important;
+  background: rgba(255,79,163,.06) !important;
+  border-radius: 10px !important;
+  padding: .75em 1em !important;
+}
+
+/* ---------- Code polish ---------- */
+pre, code, kbd, samp{
+  font-size: var(--code-font) !important;
+  line-height: 1.55 !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+pre{
+  background: var(--code-bg) !important;
+  border: 1px solid var(--code-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 14px 14px !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06) !important;
+}
+
+/* Tables */
+table{
+  width: 100% !important;
+  display: block;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--panel-border);
+}
+
+/* Media */
+img, video, canvas, svg{
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 12px;
+}
+
+/* ---------- Message “card” look ---------- */
+[data-message-author-role="assistant"] :is(article, .prose, .markdown),
+[data-message-author-role="user"] :is(article, .prose, .markdown){
+  border-radius: var(--radius-lg) !important;
+  padding: 14px 16px !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Your bubble */
+[data-message-author-role="user"] :is(article, .prose, .markdown){
+  background: var(--user-bubble) !important;
+  border: 1px solid var(--user-border) !important;
+  box-shadow: var(--shadow);
+}
+
+/* Assistant bubble */
+[data-message-author-role="assistant"] :is(article, .prose, .markdown){
+  background: var(--assistant-bubble) !important;
+  border: 1px solid var(--assistant-border) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.06);
+}
+
+/* Prevent token background classes from fighting your bubble */
+[data-message-author-role="user"] :is([class*="surface-"], [class*="bg-"]),
+[data-message-author-role="assistant"] :is([class*="surface-"], [class*="bg-"]){
+  background: transparent !important;
+}
+
+/* ---------- Composer (pink input) ---------- */
+footer [data-testid="stickerable-input"],
+footer [data-testid*="composer"],
+footer [data-testid*="prompt"],
+footer [data-testid*="input"],
+footer :is(div, section, form):has(> textarea),
+footer :is(div, section, form):has(> [contenteditable="true"]){
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  border-radius: calc(var(--radius-lg) + 2px) !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.05), 0 10px 30px rgba(255,79,163,.10) !important;
+}
+
+footer :is([data-testid="stickerable-input"], [data-testid*="composer"], [data-testid*="prompt"], [data-testid*="input"]):focus-within{
+  box-shadow: 0 0 0 4px var(--input-focus) !important,
+              inset 0 1px 2px rgba(0,0,0,.05) !important;
+  border-color: rgba(255,79,163,.70) !important;
+}
+
+/* Composer sizing + keep centered & visible */
+footer, footer form{
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 var(--side-gap) !important;
+}
+footer textarea,
+footer [contenteditable="true"]{
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  width: 100% !important;
+  padding-left: 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* Optional: slightly “pinker” send button hover (best-effort selectors) */
+footer button:hover{
+  filter: saturate(1.05);
+}
+
+/* ---------- Tiny niceties ---------- */
+::selection{
+  background: rgba(255,79,163,.22);
+}
